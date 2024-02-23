@@ -1,7 +1,29 @@
 #include <iostream>
+#include <windows.h>
+
+const char* CSI = "\x1b[";
+const char* TITLE = "\x1b[5;20H";
+const char* INDENT = "\x1b[5C";
+const char* YELLOW = "\x1b[93m";
+const char* MAGENTA = "\x1b[95m";
+const char* RESET_COLOR = "\x1b[0m";
+const char* SAVE_CURSOR_POS = "\x1b[s";
+const char* RESTORE_CURSOR_POS = "\x1b[u";
+
 
 void main()
 {
+
+// In Windows, to be able to pass commands to the terminal to control the display of text,
+// we need to enable virtual terminal sequences.
+    
+// Set output mode to handle virtual terminal sequences
+    DWORD dwMode = 0;
+    HANDLE hOut = GetStdHandle (STD_OUTPUT_HANDLE);
+    GetConsoleMode (hOut, &dwMode);
+    dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+    SetConsoleMode(hOut, dwMode);
+    
     int height = 0;
     char firstLetterOfName = 0;
     int avatarHP = 0;
