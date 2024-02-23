@@ -17,7 +17,7 @@ void main()
     Therefore cin.rdbuf()->in_avail() read how many characters remain in buffer and pass valuye to cin.ignore().*/
 
     std::cout << "You entered " << height << std::endl;
-
+    // THIS LINE IS TO  TEST THE GIT FEATURE IN VISUAL STUDIO
 
     //These lines add's a pause before exiting the console. (waits for a user input)
     std::cout << std::endl << "Press 'Enter' to exit the program." << std::endl;
