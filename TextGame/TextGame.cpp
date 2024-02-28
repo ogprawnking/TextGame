@@ -4,7 +4,7 @@
 #include <time.h>
 
 
-//Using <Windows.h> it allows us to use some functions through consts.
+// Using <Windows.h> it allows us to use some functions through consts.
 // there are more available seen through : https://msdn.microsoft.com/en-us/library/windows/desktop/mt638032(v=vs.85).aspx#example
 // BUT i'm a little unsure how to read this ^^^^^ in context :S
 
@@ -18,6 +18,13 @@ const char* MAGENTA = "\x1b[95m";
 const char* RESET_COLOR = "\x1b[0m";
 const char* SAVE_CURSOR_POS = "\x1b[s";
 const char* RESTORE_CURSOR_POS = "\x1b[u";
+
+
+const char* RED = "\x1b[91m";
+const char* BLUE = "\x1b[94m";
+const char* WHITE = "\x1b[97m";
+const char* GREEN = "\x1b[92m";
+
 
 
 void main()
@@ -55,17 +62,22 @@ void main()
     int rooms[MAZE_HEIGHT][MAZE_WIDTH];
 
     srand(time(nullptr)); // random seed based on system time by setting tim() to nullptr.
+    
     //fill arrays with random room type(0-3)
     for (int y = 0; y < MAZE_HEIGHT; y++)
     {
         for (int x = 0; x < MAZE_WIDTH; x++)
         {
-            rooms[y][x] = rand() % MAX_RANDOM_TYPE;
+            int type = rand() % (MAX_RANDOM_TYPE * 2);
+            if (type < MAX_RANDOM_TYPE)
+                rooms[y][x] = type;
+            else
+                rooms[y][x] = EMPTY;            
         }
     }
     //set the entrance and exit of the maze
     rooms[0][0] = ENTRANCE;
-    rooms[MAZE_HEIGHT - 1];
+    rooms[MAZE_HEIGHT - 1][MAZE_WIDTH - 1] = EXIT;
 
     std::cout << std::endl;
     std::cout << std::endl;
@@ -78,6 +90,7 @@ void main()
     // saving cursor position
     std::cout << SAVE_CURSOR_POS;
 
+    // print rooms for maze
     std::cout << std::endl;
     std::cout << std::endl;
     std::cout << std::endl;
@@ -87,7 +100,29 @@ void main()
         std::cout << INDENT;
         for (int x = 0; x < MAZE_WIDTH; x++)
         {
-            std::cout << "[ " << rooms[y][x] << " ]";
+            switch (rooms[y][x])
+            {
+            case EMPTY:
+                std::cout << "[ " << GREEN << "\xDB" << RESET_COLOR << " ]";
+                break;
+            case ENEMY:
+                std::cout << "[ " << RED << "\x94" << RESET_COLOR << " ]";
+                break;
+            case TREASURE:
+                std::cout << "[ " << YELLOW << "$" << RESET_COLOR << " ]";
+                break;
+            case FOOD:
+                std::cout << "[ " << WHITE << "\xcf" << RESET_COLOR << " ]";
+                break;
+            case ENTRANCE:
+                std::cout << "[" << WHITE << "EN" << RESET_COLOR << " ]";
+                break;
+            case EXIT:
+                std::cout << "[ " << WHITE << "EX" << RESET_COLOR << "]";
+                break;
+
+            }
+            
         }
         std::cout << std::endl;
     }
