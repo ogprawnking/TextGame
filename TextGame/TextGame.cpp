@@ -1,4 +1,4 @@
-#include <iostream>
+﻿#include <iostream>
 #include <windows.h>
 #include <random>
 #include <time.h>
@@ -39,6 +39,19 @@ void main()
 
     const int MAZE_WIDTH = 10;
     const int MAZE_HEIGHT = 6;
+
+    const int INDENT_X = 5; // how manyt spaces to use to indent text. (AKA tab)
+    const int ROOM_DESC_Y = 8; // line to use for room descriptions
+    const int MAP_Y = 13; // first line where map is drawn
+    const int PLAYER_INPUT_X = 30; // character column where player will type their input
+    const int PLAYER_INPUT_Y = 11; // line where player will type their input
+
+    // numbers for numberpad movement instead of WASD.
+    const int WEST = 4;
+    const int EAST = 6;
+    const int NORTH = 8;
+    const int SOUTH = 2;
+
 
     /* In WINDOWS, to be able to pass commands to the terminal to control the display of text,
     we need to enable virtual terminal sequences. */
@@ -91,10 +104,8 @@ void main()
     std::cout << SAVE_CURSOR_POS;
 
     // print rooms for maze
-    std::cout << std::endl;
-    std::cout << std::endl;
-    std::cout << std::endl;
-    std::cout << std::endl;
+    
+    std::cout << CSI << MAP_Y << ";" << 0 << "H";
     for (int y = 0; y < MAZE_HEIGHT; y++)
     {
         std::cout << INDENT;
@@ -103,7 +114,7 @@ void main()
             switch (rooms[y][x])
             {
             case EMPTY:
-                std::cout << "[ " << GREEN << "\xDB" << RESET_COLOR << " ]";
+                std::cout << "[ " << GREEN << "\xB0" << RESET_COLOR << " ]";
                 break;
             case ENEMY:
                 std::cout << "[ " << RED << "\x94" << RESET_COLOR << " ]";
@@ -115,10 +126,10 @@ void main()
                 std::cout << "[ " << WHITE << "\xcf" << RESET_COLOR << " ]";
                 break;
             case ENTRANCE:
-                std::cout << "[" << WHITE << "EN" << RESET_COLOR << " ]";
+                std::cout << "[ " << WHITE << "\xE8" << RESET_COLOR << " ]";
                 break;
             case EXIT:
-                std::cout << "[ " << WHITE << "EX" << RESET_COLOR << "]";
+                std::cout << "[ " << WHITE << "\xFE" << RESET_COLOR << " ]";
                 break;
 
             }
@@ -126,65 +137,125 @@ void main()
         }
         std::cout << std::endl;
     }
+    
+    bool gameOver = false;
+    // player position on map
+    int playerX = 0;
+    int playerY = 0;
 
-    // move the cursor back to the top of the map
-    std::cout << RESTORE_CURSOR_POS;
-    std::cout << INDENT << "How tall are you, in centimeters? " << INDENT << YELLOW;
+    //game loop
+    while (!gameOver)
+    {
+        // prepare screen for output
+        // move cursor to start of the 1st Q, then up 1, delete and insert 4 lines
+        std::cout << RESTORE_CURSOR_POS << CSI << "A" << CSI << "4M" << CSI << "4L" << std::endl;
 
-    std::cin >> height;
-    std::cout << RESET_COLOR << std::endl;
+        // write description of current room
+        switch (rooms[playerY][playerX]) 
+        {
+        case EMPTY:
+            std::cout << INDENT << "You are in an empty meadow. There is nothign of note here." << std::endl;
+            break;
+        case ENEMY:
+            std::cout << INDENT << "BEWARE. An enemy is approaching." << std::endl;
+            break;
+        case TREASURE:
+            std::cout << INDENT << "Your efforts have been rewarded. You have found some TREASURE" << std::endl;
+            break;
+        case FOOD:
+            std::cout << INDENT << "At last! You collect some food to sustain you on your journey." << std::endl;
+            break;
+        case ENTRANCE:
+            std::cout << INDENT << "The entranc you use to enter this maze is blocked. There is no going back." << std::endl;
+            break;
+        case EXIT:
+            std::cout << INDENT << "Despite all odds, you made it to the exit... CONGRATULATIONS!" << std::endl;
+            gameOver = true;
+            continue;
+        } 
+        // list directions the player can take
+        std::cout << INDENT << "You can see paths leading to the " <<
+            ((playerX > 0) ? "west, " : "") <<
+            ((playerX < MAZE_WIDTH - 1) ? "east, " : "") <<
+            ((playerX > 0) ? "north, " : "") <<
+            ((playerX < MAZE_WIDTH - 1) ? "south, " : "") << std::endl;
 
-    if (std::cin.fail()) { 
-    //fail() func = true if wrong data type entered into input.
-        std::cout << INDENT << "You have failed the first challenge and are eaten by a grue.";
-    }
-    else {
-        std::cout << INDENT << "You entered " << height;
-    }
+        std::cout << INDENT << "Where to now?";
+
+        int x = INDENT_X + (5 * playerX) + 3;
+        int y = MAP_Y + playerY;
+        
+        // draw player's position on map
+        // move cursor to map pos and delete character at current position
+        std::cout << CSI << y << ";" << x << "H";
+        std::cout << MAGENTA << "\x81";
+
+        // move cursor to position for player to enter input
+        std::cout << CSI << PLAYER_INPUT_Y << ";" << PLAYER_INPUT_X << "H" << YELLOW;
+
+        // clear input buffer, ready for player input
+        std::cin.clear();
+        std::cin.ignore(std::cin.rdbuf()->in_avail());
+
+        int direction = 0;
+        std::cin >> direction;
+        std::cout << RESET_COLOR;
+
+        if (std::cin.fail())
+            continue;   // go back to top of the game loop and ask again
 
 
-    //clears any data inside the input buffer
-    std::cin.clear();
-    std::cin.ignore(std::cin.rdbuf()->in_avail()); /*needs argument that tells how many characters to ignore.
-    Therefore cin.rdbuf()->in_avail() reads how many characters remain in buffer and pass valuye to cin.ignore().*/
-    std::cin.get(); // Typically used for enter key, so that the game doesn't go through too fast. (Needs no input inside buffer)
-    //move the cursor to the start of the 1st question
-    std::cout << RESTORE_CURSOR_POS;
-    // THEN delete the next 3 lines of text
-    std::cout << CSI << "3M";
-    // insert 3 lines (so map stays in same place)
-    std::cout << CSI << "3L";
 
-    // This section is to: See how to input a single letter or "char" as input.
-    // If the input isn't alphanumeric (abcd...xyz), then we have an error.
-    std::cout << INDENT << "What is the first letter of your name? " << INDENT << YELLOW;
-    std::cin.clear();
-    std::cin.ignore(std::cin.rdbuf()->in_avail());
-    std::cin >> firstLetterOfName;
-    std::cout << RESET_COLOR << std::endl;
 
-    if (std::cin.fail() || !isalpha(firstLetterOfName)) {
-        std::cout << INDENT << "You ahve failed the second challenge and are eaten by a grue." << std::endl;
-    }
-    else {
-        std::cout << INDENT << "You entered " << firstLetterOfName << std::endl;
-    }
-    std::cin.clear();
-    std::cin.ignore(std::cin.rdbuf()->in_avail());
-    std::cin.get(); //press enter...
+        // before updating player position, redraw the old room character over-
+        // -the old position... Using the current character position.
+        std::cout << CSI << y << ";" << x << "H";
+        switch (rooms[playerY][playerX])
+        {
+        case EMPTY:
+            std::cout << GREEN << "\xB0" << RESET_COLOR;
+            break;
+        case ENEMY:
+            std::cout << RED << "\x94" << RESET_COLOR;
+            break;
+        case TREASURE:
+            std::cout << YELLOW << "$" << RESET_COLOR;
+            break;
+        case FOOD:
+            std::cout << WHITE << "\xcf" << RESET_COLOR;
+            break;
+        case ENTRANCE:
+            std::cout << WHITE << "\xE8" << RESET_COLOR;
+            break;
+        case EXIT:
+            std::cout << WHITE << "\xFE" << RESET_COLOR;
+            break;
+        }
+        
+        // update player's 'X' & 'Y' position Using the input from the user.
 
-    //move cursor to the start of the 1st question
-    //then delete & insert 4 lines
-    std::cout << RESTORE_CURSOR_POS << CSI << "A" << CSI << "4M" << CSI << "4L";
-    // This section: determins the health of the player based on their height and fraction of their first letter value.
-    // The first letter of their name is able to be calc'd as a number because of ASCII values.
-    if (firstLetterOfName != 0) {
-        avatarHP = (float)height / (firstLetterOfName * 0.2f);
-    }
-    else {
-        avatarHP = 0;
-    }
-    std::cout << INDENT << "Using a complex deterministic algorithm, it has been calculated that you have " << avatarHP << " hit point(s)." << std::endl;
+        switch (direction) {
+        case EAST:
+            if (playerX < MAZE_WIDTH - 1) // if less than the far right side of map
+                playerX++; // move right one spot
+            break;
+        case WEST:
+            if (playerX > 0) // if more than far left side of map
+                playerX--; // move left one spot
+            break;
+        case NORTH:
+            if (playerY > 0) // if lower than top of map (larger Y number means position is lower)
+                playerY--; // move them up one spot
+            break;
+        case SOUTH:
+            if (playerY < MAZE_HEIGHT - 1) // if less than height (height number increases going down)
+                playerY++; // move down one spot
+            break;
+        default:
+            // do nothing, go back to top of loop and ask again (until valid case)
+            break;
+        }
+    } //end of game loop! ☻
     
     //These lines add's a pause before exiting the console. (waits for a user input)
     std::cout << std::endl << INDENT << "Press 'Enter' to exit the program." << std::endl;
