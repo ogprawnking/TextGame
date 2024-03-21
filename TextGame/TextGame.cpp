@@ -30,6 +30,8 @@ const int WEST = 4;
 const int EAST = 6;
 const int NORTH = 8;
 const int SOUTH = 2;
+const int LOOK = 9;
+const int FIGHT = 10;
 
 // --- FUNCTION PROTOTYPES ---
 void initialise(int map[MAZE_HEIGHT][MAZE_WIDTH]);
@@ -37,7 +39,9 @@ void drawWelcomeMessage();
 void drawMap(int map[MAZE_HEIGHT][MAZE_WIDTH], int playerX, int playerY);
 void drawRoomDescription(int roomType);
 void drawValidDirections(int x, int y);
-int getMovementDirection();
+int getCommand();
+void waitForInput();
+
 
 
 
@@ -75,13 +79,10 @@ void main() {
 		drawValidDirections(playerX, playerY);
 		std::cout << INDENT << "Where to now?" << INDENT;
 
-		int direction = getMovementDirection();
-
+		int command = getCommand();
 
 		// update player's position using input data from user.
-
-
-		switch (direction) {
+		switch (command) {
 		case EAST:
 			if (playerX < MAZE_WIDTH - 1) // if less than the far right side of map
 				playerX++; // move right one spot
@@ -101,6 +102,10 @@ void main() {
 			// direction wasn't valid
 			// do nothing, go back to the top of the loop and ask again
 			break;
+		case LOOK:
+			std::cout << INDENT << "You look around, but see nothing worth mentioning" << std::endl;
+			std::cout << "Press 'Enter' to continue.";
+			waitForInput(); //clear input buffer and wait for user to press 'any key'
 		}
 
 	} // <<< end of the game loop
@@ -218,17 +223,53 @@ void drawValidDirections(int x, int y)
 		((y < MAZE_HEIGHT - 1) ? "south, " : "") << std::endl;
 }
 
-int getMovementDirection()
+int getCommand()
 {
+	// limit user input to 50 characters... For now..
+	char input[50] = "\0"; // ALWAYS initialise with nullchar
+	std::cout << INDENT << "Enter a command:" << INDENT;
+
 	// clear the input buffer, ready for player input
 	std::cin.clear();
 	std::cin.ignore(std::cin.rdbuf()->in_avail());
 
-	int direction = 0;
-	std::cin >> direction;
+	std::cin >> input; // Get user input
 
-	if (std::cin.fail())
-		return 0;
-	return direction;
+
+	bool bMove = false; // aka:boolMove.. change to true if input is any movement variety. (North, sout, east, west)... If 'look' or 'fight' bMove doesn't need to be 'true'
+	while (input)
+	{
+		if (strcmp(input, "move") == 0) {
+			bMove = true;
+		}
+		else if (bMove == true) {
+			if (strcmp(input, "north") == 0)
+				return NORTH;
+			if (strcmp(input, "south") == 0)
+				return SOUTH;
+			if (strcmp(input, "east") == 0)
+				return EAST;
+			if (strcmp(input, "west") == 0)
+				return WEST;
+		}
+		if (strcmp(input, "look") == 0) {
+			return LOOK;
+		}
+		if (strcmp(input, "fight") == 0) {
+			return FIGHT;
+		}
+
+		char next = std::cin.peek();
+		if (next == '\n' || next == EOF)
+			break;
+		std::cin >> input;
+	}
+	return 0;
+
 }
 
+void waitForInput() {
+	std::cin.clear();
+	std::cin.ignore(std::cin.rdbuf()->in_avail());
+	std::cin.get();
+}
