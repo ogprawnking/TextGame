@@ -33,12 +33,21 @@ const int SOUTH = 2;
 const int LOOK = 9;
 const int FIGHT = 10;
 
+
+
+
+// structs
+struct Point2D {
+	int x;
+	int y;
+};
+
 // --- FUNCTION PROTOTYPES ---
 void initialise(int map[MAZE_HEIGHT][MAZE_WIDTH]);
 void drawWelcomeMessage();
-void drawMap(int map[MAZE_HEIGHT][MAZE_WIDTH], int playerX, int playerY);
+void drawMap(int map[MAZE_HEIGHT][MAZE_WIDTH], Point2D position);
 void drawRoomDescription(int roomType);
-void drawValidDirections(int x, int y);
+void drawValidDirections(Point2D position);
 int getCommand();
 void waitForInput();
 
@@ -51,9 +60,8 @@ void main() {
 	int rooms[MAZE_HEIGHT][MAZE_WIDTH];
 
 	bool gameOver = false;
-	// player position on map
-	int playerX = 0;
-	int playerY = 0;
+	// player position
+	Point2D player = { 0, 0 }; // struct made for x,y coords
 
 	initialise(rooms);
 
@@ -65,18 +73,18 @@ void main() {
 		drawWelcomeMessage();
 
 		// output the map
-		drawMap(rooms, playerX, playerY);
+		drawMap(rooms, player);
 
 		// write description of current room
-		drawRoomDescription(rooms[playerY][playerX]);
-		if (rooms[playerY][playerX] == EXIT)
+		drawRoomDescription(rooms[player.y][player.x]);
+		if (rooms[player.y][player.x] == EXIT)
 		{
 			gameOver = true;
 			break;
 		}
 
 		// list the directions the player can take
-		drawValidDirections(playerX, playerY);
+		drawValidDirections(player);
 		std::cout << INDENT << "Where to now?" << INDENT;
 
 		int command = getCommand();
@@ -84,20 +92,20 @@ void main() {
 		// update player's position using input data from user.
 		switch (command) {
 		case EAST:
-			if (playerX < MAZE_WIDTH - 1) // if less than the far right side of map
-				playerX++; // move right one spot
+			if (player.x < MAZE_WIDTH - 1) // if less than the far right side of map
+				player.x++; // move right one spot
 			break;
 		case WEST:
-			if (playerX > 0) // if more than far left side of map
-				playerX--; // move left one spot
+			if (player.x > 0) // if more than far left side of map
+				player.x--; // move left one spot
 			break;
 		case NORTH:
-			if (playerY > 0) // if lower than top of map (larger Y number means position is lower)
-				playerY--; // move them up one spot
+			if (player.y > 0) // if lower than top of map (larger Y number means position is lower)
+				player.y--; // move them up one spot
 			break;
 		case SOUTH:
-			if (playerY < MAZE_HEIGHT - 1) // if less than height (height number increases going down)
-				playerY++; // move down one spot
+			if (player.y < MAZE_HEIGHT - 1) // if less than height (height number increases going down)
+				player.y++; // move down one spot
 		default:
 			// direction wasn't valid
 			// do nothing, go back to the top of the loop and ask again
@@ -148,7 +156,7 @@ void drawWelcomeMessage()
 	std::cout << INDENT << "It is definitely not related to any other text-based adventure game." << std::endl << std::endl;
 }
 
-void drawMap(int map[MAZE_HEIGHT][MAZE_WIDTH], int playerX, int playerY)
+void drawMap(int map[MAZE_HEIGHT][MAZE_WIDTH], Point2D position)
 {
 	std::cout << std::endl;
 	std::cout << std::endl;
@@ -157,7 +165,7 @@ void drawMap(int map[MAZE_HEIGHT][MAZE_WIDTH], int playerX, int playerY)
 		std::cout << INDENT;
 		for (int x = 0; x < MAZE_WIDTH; x++) {
 
-			if (playerX == x && playerY == y) {
+			if (position.x == x && position.y == y) {
 				// draw the player's position on the map
 				std::cout << PLAYER_TILE;
 				continue;
@@ -214,13 +222,13 @@ void drawRoomDescription(int roomType)
 	}
 }
 
-void drawValidDirections(int x, int y)
+void drawValidDirections(Point2D position)
 {
 	std::cout << INDENT << "You can see paths leading to the " <<
-		((x > 0) ? "west, " : "") <<
-		((x < MAZE_WIDTH - 1) ? "east, " : "") <<
-		((y > 0) ? "north, " : "") <<
-		((y < MAZE_HEIGHT - 1) ? "south, " : "") << std::endl;
+		((position.x > 0) ? "west, " : "") <<
+		((position.x < MAZE_WIDTH - 1) ? "east, " : "") <<
+		((position.y > 0) ? "north, " : "") <<
+		((position.y < MAZE_HEIGHT - 1) ? "south, " : "") << std::endl;
 }
 
 int getCommand()
