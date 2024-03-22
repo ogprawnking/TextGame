@@ -3,18 +3,14 @@
 #include <iostream>
 
 
-Player::Player()
+Player::Player() : m_mapPosition{ 0,0 }
 {
-	// player needs these values whenever constructed
-	m_mapPosition.x = 0;
-	m_mapPosition.y = 0;
+	// changed values to uniform initialised list
 }
 
-Player::Player(int x, int y)
+Player::Player(int x, int y) : m_mapPosition{ x, y }
 {
-	// overLConstr for altering x,y m_mapPositions
-	m_mapPosition.x = x;
-	m_mapPosition.y = y;
+	// changed to uniform initialised list: overLConstr for altering x,y m_mapPositions
 }
 
 Player::~Player()

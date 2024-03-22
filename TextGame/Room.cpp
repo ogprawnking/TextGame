@@ -2,11 +2,9 @@
 #include "GameDefines.h"
 #include <iostream>
 
-Room::Room()
+Room::Room() : m_type(EMPTY), m_mapPosition{ 0,0 }
 {
-	m_type = EMPTY;
-	m_mapPosition.x = 0; //struct from Room.h
-	m_mapPosition.y = 0;
+	// 2 variables initialised list
 }
 
 Room::~Room()

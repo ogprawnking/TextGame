@@ -3,9 +3,9 @@
 //#include <random>
 //#include <time.h>
 
-Game::Game()
+Game::Game() : m_gameOver{false}
 {
-	m_gameOver = false; // initialise game_over here or in startup()
+	// uniform initialise game_over here or in startup()
 }
 
 Game::~Game()
