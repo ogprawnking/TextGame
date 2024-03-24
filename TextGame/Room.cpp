@@ -36,7 +36,9 @@ void Room::draw()
 	case ENEMY:
 		std::cout << ENEMY_TILE;
 		break;
-	case TREASURE:
+	case TREASURE_HP:
+	case TREASURE_ATT:
+	case TREASURE_DEF:
 		std::cout << TREASURE_TILE;
 		break;
 	case FOOD:
@@ -60,7 +62,9 @@ void Room::drawDescription() // used to describe current room
 	case ENEMY:
 		std::cout << INDENT << "BEWARE. An enemy is approaching." << std::endl;
 		break;
-	case TREASURE:
+	case TREASURE_HP:
+	case TREASURE_ATT:
+	case TREASURE_DEF:
 		std::cout << INDENT << "Your journey has been rewarded. You have found some treasure" << std::endl;
 		break;
 	case FOOD:
@@ -79,8 +83,13 @@ bool Room::executeCommand(int command)
 {
 	switch (command) {
 	case LOOK:
-		std::cout << INDENT << "You look around, but see nothing worth mentioning" << std::endl;
-		std::cout << "Press 'Enter' to continue.";
+		if (m_type == TREASURE_HP || m_type == TREASURE_ATT || m_type == TREASURE_DEF) {
+			std::cout << INDENT << "There is some treasure here. It looks small enough to pickup." << std::endl;
+		}
+		else {
+			std::cout << INDENT << "You look around, but see nothing worth mentioning" << std::endl;
+		}
+			std::cout << "Press 'Enter' to continue.";
 		waitForInput(); //clear input buffer and wait for user to press 'any key'
 		break;
 	case FIGHT:

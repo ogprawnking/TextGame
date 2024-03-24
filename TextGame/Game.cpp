@@ -34,7 +34,7 @@ void Game::update()
 
 	int command = getCommand();
 
-	if (m_player.executeCommand(command)) // execute direction player input i.e. N, S, E, W
+	if (m_player.executeCommand(command, m_map[playerPos.y][playerPos.x].getType())) // execute direction player input i.e. N, S, E, W
 		return;
 
 	m_map[playerPos.y][playerPos.x].executeCommand(command);
@@ -56,6 +56,8 @@ void Game::draw()
 	m_map[playerPos.y][playerPos.x].drawDescription();
 	//redraw map
 	drawMap();
+	// draw player's inventory
+	m_player.drawInventory();
 }
 
 // well... is it?
@@ -73,8 +75,11 @@ void Game::initializeMap()
 	for (int y = 0; y < MAZE_HEIGHT; y++){
 		for (int x = 0; x < MAZE_WIDTH; x++){
 			int type = rand() % (MAX_RANDOM_TYPE * 2);
-			if (type < MAX_RANDOM_TYPE)
+			if (type < MAX_RANDOM_TYPE) {
+				if (type == TREASURE) // if roomType is TREASURE
+					type = rand() % 3 + TREASURE_HP; // add treasure of value between Treasure_hp (=6) and Treasure_Def(=8)
 				m_map[y][x].setType(type);
+			}
 			else
 				m_map[y][x].setType(EMPTY);
 			m_map[y][x].setPosition(Point2D{ x,y });
@@ -147,6 +152,7 @@ int Game::getCommand()
 
 
 	bool bMove = false; // aka:boolMove.. change to true if input is any movement variety. (North, sout, east, west)... If 'look' or 'fight' bMove doesn't need to be 'true'
+	bool bPickup = false;
 	while (input)
 	{
 		if (strcmp(input, "move") == 0) {
@@ -168,6 +174,15 @@ int Game::getCommand()
 		if (strcmp(input, "fight") == 0) {
 			return FIGHT;
 		}
+
+		if (strcmp(input, "pick") == 0) {
+			bPickup = true;
+		}
+		else if (bPickup == true){
+			if (strcmp(input, "up") == 0)
+			return PICKUP;
+		}
+
 
 		char next = std::cin.peek();
 		if (next == '\n' || next == EOF)
