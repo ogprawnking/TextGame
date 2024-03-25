@@ -1,9 +1,8 @@
 #pragma once
 #include "Point2D.h"
-#include "Powerup.h"
 #include <vector>
 
-class Room;
+class Powerup;
 
 class Player
 {
@@ -12,6 +11,8 @@ public:
 	Player(int x, int y);
 	~Player();
 
+	void addPowerup(Powerup* pPowerup);
+
 	void setPosition(Point2D position); //set x, y pos
 
 	Point2D getPosition(); // get x, y pos
@@ -19,15 +20,15 @@ public:
 	void draw(); // draw player on map
 	void drawInventory(); // draws inventory on screen
 
-	bool executeCommand(int command, Room* pRoom);
+	bool executeCommand(int command);
 	
 private:
-	bool pickup(Room* room);
+	
 
 private:
 	Point2D m_mapPosition;
 
-	std::vector<Powerup> m_powerups;
+	std::vector<Powerup*> m_powerups;
 
 	int m_healthPoints;
 	int m_attackPoints;

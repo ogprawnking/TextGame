@@ -34,12 +34,22 @@ void Game::update()
 
 	int command = getCommand();
 
-// execute direction player input i.e. N, S, E, W
-	// change the room to EMPTY that the player is on.. changes it by reference to x/y pos of player.
-	if (m_player.executeCommand(command, &m_map[playerPos.y][playerPos.x])) 
+	if (command == QUIT) {
+		m_gameOver = true;
+		return;
+	}
+
+	if (m_player.executeCommand(command))
 		return;
 
-	m_map[playerPos.y][playerPos.x].executeCommand(command);
+	m_map[playerPos.y][playerPos.x].executeCommand(command, &m_player);
+
+// execute direction player input i.e. N, S, E, W
+	// change the room to EMPTY that the player is on.. changes it by reference to x/y pos of player.
+	if (m_player.executeCommand(command))
+		return;
+
+	m_map[playerPos.y][playerPos.x].executeCommand(command, &m_player);
 }
 
 // Draw functions
@@ -176,7 +186,9 @@ int Game::getCommand()
 		if (strcmp(input, "fight") == 0) {
 			return FIGHT;
 		}
-
+		if (strcmp(input, "exit") == 0) {
+			return QUIT;
+		}
 		if (strcmp(input, "pick") == 0) {
 			bPickup = true;
 		}

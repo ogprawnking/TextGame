@@ -37,8 +37,8 @@ float Powerup::getDefenceMultiplier()
 	return m_defenceMultiplier;
 }
 
-bool Powerup::compare(const Powerup& p1, const Powerup& p2)
+bool Powerup::compare(const Powerup* p1, const Powerup* p2)
 {
 	// compares powerup name and sorts them based on each char (as numbers)
-	return (strcmp(p1.m_name, p2.m_name) < 0) ? true : false;
+	return (strcmp(p1->m_name, p2->m_name) < 0) ? true : false;
 }
