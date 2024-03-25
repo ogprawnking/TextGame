@@ -3,6 +3,8 @@
 #include "Powerup.h"
 #include <vector>
 
+class Room;
+
 class Player
 {
 public:

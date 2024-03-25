@@ -47,7 +47,7 @@ void Player::drawInventory()
 	std::cout << "\n" << std::endl;
 }
 
-bool Player::executeCommand(int command, Room* pRoom)
+bool Player::executeCommand(int command, Room* room)
 {
 	switch (command) {
 	case EAST:
@@ -67,7 +67,7 @@ bool Player::executeCommand(int command, Room* pRoom)
 			m_mapPosition.y++; // move down one spot
 		return true;
 	case PICKUP:
-		return pickup(pRoom); // pass roomType because it's only valid in that roomType
+		return pickup(room); // pass roomType because it's only valid in that roomType
 
 	}
 	return false; //if none of these commands
