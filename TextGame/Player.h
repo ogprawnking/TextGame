@@ -17,10 +17,10 @@ public:
 	void draw(); // draw player on map
 	void drawInventory(); // draws inventory on screen
 
-	bool executeCommand(int command, int roomType);
+	bool executeCommand(int command, Room* pRoom);
 	
 private:
-	bool pickup(int roomType);
+	bool pickup(Room* room);
 
 private:
 	Point2D m_mapPosition;

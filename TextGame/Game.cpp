@@ -34,7 +34,9 @@ void Game::update()
 
 	int command = getCommand();
 
-	if (m_player.executeCommand(command, m_map[playerPos.y][playerPos.x].getType())) // execute direction player input i.e. N, S, E, W
+// execute direction player input i.e. N, S, E, W
+	// change the room to EMPTY that the player is on.. changes it by reference to x/y pos of player.
+	if (m_player.executeCommand(command, &m_map[playerPos.y][playerPos.x])) 
 		return;
 
 	m_map[playerPos.y][playerPos.x].executeCommand(command);

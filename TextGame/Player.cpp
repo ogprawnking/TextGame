@@ -5,6 +5,7 @@
 #include  "GameDefines.h"
 #include <iostream>
 #include <algorithm>
+#include "Room.h"
 
 
 Player::Player() : m_mapPosition{ 0,0 }, m_healthPoints{ 100 }, m_attackPoints{ 20 }, m_defencePoints{ 20 }
@@ -46,7 +47,7 @@ void Player::drawInventory()
 	std::cout << "\n" << std::endl;
 }
 
-bool Player::executeCommand(int command, int roomType)
+bool Player::executeCommand(int command, Room* pRoom)
 {
 	switch (command) {
 	case EAST:
@@ -66,13 +67,13 @@ bool Player::executeCommand(int command, int roomType)
 			m_mapPosition.y++; // move down one spot
 		return true;
 	case PICKUP:
-		return pickup(roomType); // pass roomType because it's only valid in that roomType
+		return pickup(pRoom); // pass roomType because it's only valid in that roomType
 
 	}
 	return false; //if none of these commands
 }
 
-bool Player::pickup(int roomType)
+bool Player::pickup(Room* room)
 {
 	static const char itemNames[15][30] = {
 		"indifference", "invisibility", "invulnerability", "incontinence",
@@ -84,7 +85,7 @@ bool Player::pickup(int roomType)
 	int item = rand() % 15; // choose random name of these 15 options
 	char name[30] = ""; // a name can have 30 characters
 
-	switch (roomType) {
+	switch (room->getType()) {
 	case TREASURE_HP:
 		strcpy(name, "potion of ");
 		break;
@@ -104,6 +105,8 @@ bool Player::pickup(int roomType)
 	m_powerups.push_back(Powerup(name, 1, 1, 1.1f));
 
 	std::sort(m_powerups.begin(), m_powerups.end(), Powerup::compare);
+	// set room to EMPTY after: pickup item, add to inventory and sort inventory.
+	room->setType(EMPTY);
 
 	std::cout << INDENT << "Press 'Enter' to continue.";
 	std::cin.clear();
