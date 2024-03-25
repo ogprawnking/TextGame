@@ -4,6 +4,7 @@
 // All functions and variables are in classes now!
 // Just need to implement a loop for the game's draw and update classes/functions
 
+
 void main() {
 	Game game;
 	

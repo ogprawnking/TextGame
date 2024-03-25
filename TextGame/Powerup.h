@@ -10,6 +10,8 @@ public:
 	float getAttackMultiplier();
 	float getDefenceMultiplier();
 
+	static bool compare(const Powerup& p1, const Powerup& p2); //compare 2 powerups
+
 private:
 	char m_name[30];
 
@@ -17,4 +19,3 @@ private:
 	float m_attackMultiplier;
 	float m_defenceMultiplier;
 };
-
