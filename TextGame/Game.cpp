@@ -1,5 +1,10 @@
+#define _CRT_SECURE_NO_WARNINGS
+
 #include "Game.h"
 #include <iostream>
+#include "Enemy.h"
+#include "Powerup.h"
+#include "Food.h"
 //#include <random>
 //#include <time.h>
 
@@ -10,11 +15,17 @@ Game::Game() : m_gameOver{false}
 
 Game::~Game()
 {
+	delete[] m_powerups;
+	delete[] m_enemies;
+	delete[] m_food;
 }
 
 // Create map, set playerPos
 bool Game::startup() // on game startup
 {
+	//initialise srand to nullptr if anywhere else needs to use it.
+	srand(time(nullptr));
+
 	initializeMap(); // create map (includes rooms and types)
 		
 	m_player.setPosition(Point2D{ 0,0 }); // create player position on map
@@ -39,17 +50,14 @@ void Game::update()
 		return;
 	}
 
-	if (m_player.executeCommand(command))
-		return;
+	m_player.executeCommand(command, &m_map[playerPos.y][playerPos.x]);
 
-	m_map[playerPos.y][playerPos.x].executeCommand(command, &m_player);
-
-// execute direction player input i.e. N, S, E, W
-	// change the room to EMPTY that the player is on.. changes it by reference to x/y pos of player.
-	if (m_player.executeCommand(command))
-		return;
-
-	m_map[playerPos.y][playerPos.x].executeCommand(command, &m_player);
+	for (int i = 0; i < m_enemyCount; i++) {
+		if (m_enemies[i].isAlive() == false) {
+			Point2D pos = m_enemies[i].getPosition();
+			m_map[pos.y][pos.x].setEnemy(nullptr);
+		}
+	}
 }
 
 // Draw functions
@@ -78,22 +86,16 @@ bool Game::isGameOver() {
 }
 
 // create map
+// set xy coordinates of each room. Rooms initialised to EMPTY (from the Room constructor)
+// entrance/exit rooms set
 void Game::initializeMap()
 { 
 	srand(time(nullptr));
 
 	// fill arrays with random room types
 	// nested loop... for each row(y), fill the columns(x) with randType of room and update position to x,y position of loop
-	for (int y = 0; y < MAZE_HEIGHT; y++){
-		for (int x = 0; x < MAZE_WIDTH; x++){
-			int type = rand() % (MAX_RANDOM_TYPE * 2);
-			if (type < MAX_RANDOM_TYPE) {
-				if (type == TREASURE) // if roomType is TREASURE
-					type = rand() % 3 + TREASURE_HP; // add treasure of value between Treasure_hp (=6) and Treasure_Def(=8)
-				m_map[y][x].setType(type);
-			}
-			else
-				m_map[y][x].setType(EMPTY);
+	for (int y = 0; y < MAZE_HEIGHT; y++) {
+		for (int x = 0; x < MAZE_WIDTH; x++) {
 			m_map[y][x].setPosition(Point2D{ x,y });
 		}
 	}
@@ -101,6 +103,84 @@ void Game::initializeMap()
 	// set entrance and exit of map/maze (1st box & last box)
 	m_map[0][0].setType(ENTRANCE);
 	m_map[MAZE_HEIGHT - 1][MAZE_WIDTH - 1].setType(EXIT);
+}
+
+
+// randomly set value for number of enemies to create.
+// allocate dynamic array of that size and place enemis RANDOMLY on map
+void Game::initializeEnemies()
+{
+	// create dynamic array of enemies
+	// (the number of enemies will change every game)
+	m_enemyCount = 1 + rand() % 4;
+	m_enemies = new Enemy[m_enemyCount];
+
+	//randomly place enemies in room on the map
+	for (int i = 0; i < m_enemyCount; i++)
+	{
+		// a bit of math ensures enemies wont spawn directly
+		// on or next to entrance
+		int x = 2 + (rand() % (MAZE_WIDTH - 3));
+		int y = 2 + (rand() % (MAZE_HEIGHT - 3));
+
+		m_enemies[i].setPosition(Point2D{ x,y });
+		m_map[y][x].setEnemy(&m_enemies[i]);
+	}
+}
+
+
+// create 3 kinds of powerups (potion, sword, shield) and place them randomly around map
+void Game::initializePowerups()
+{
+	// create some powerups
+	m_powerupCount = 3;
+	m_powerups = new Powerup[m_powerupCount];
+	// randomly place the food in the map
+	for (int i = 0; i < m_powerupCount; i++)
+	{
+		char name[30] = "";
+		int x = rand() % (MAZE_WIDTH - 1);
+		int y = rand() % (MAZE_HEIGHT - 1);
+
+		float HP = 1;
+		float ATT = 1;
+		float DEF = 1;
+
+		switch (i) {
+		case 0:
+			strcpy(name, "potion of ");
+			m_powerups[i].setHealthMultiplier(1.1f);
+			break;
+		case 1:
+			strcpy(name, "sword of ");
+			m_powerups[i].setAttackMultiplier(1.1f);
+			break;
+		case 2:
+			strcpy(name, "shield of  ");
+			m_powerups[i].setDefenceMultiplier(1.1f);
+			break;
+		}
+
+		strncat(name, itemNames[(rand() % 15)], 30);
+		m_powerups[i].setName(name);
+		m_map[y][x].setPowerup(&m_powerups[i]);
+	}
+}
+
+
+// creates set number of Food objects and place them randomly.
+void Game::initializeFood()
+{
+	// create some food
+	m_foodCount = 3;
+	m_food = new Food[m_foodCount];
+	// randomly place the food in the map
+	for (int i = 0; i < m_foodCount; i++)
+	{
+		int x = rand() % (MAZE_WIDTH - 1);
+		int y = rand() % (MAZE_HEIGHT - 1);
+		m_map[y][x].setFood(&m_food[i]);
+	}
 }
 
 // A welcome message :)

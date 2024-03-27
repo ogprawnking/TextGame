@@ -3,6 +3,9 @@
 #include <vector>
 
 class Powerup;
+class Room;
+class Enemy;
+
 
 class Player
 {
@@ -13,17 +16,15 @@ public:
 
 	void addPowerup(Powerup* pPowerup);
 
-	void setPosition(Point2D position); //set x, y pos
-
+	void setPosition(const Point2D& position); // Only refer to the position
 	Point2D getPosition(); // get x, y pos
-
 	void draw(); // draw player on map
 	void drawInventory(); // draws inventory on screen
-
-	bool executeCommand(int command);
+	void executeCommand(int command, Room* pRoom);
 	
 private:
-	
+	void pickup(Room* pRoom);
+	void attack(Enemy* pEnemy);
 
 private:
 	Point2D m_mapPosition;
