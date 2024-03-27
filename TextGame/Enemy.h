@@ -14,7 +14,7 @@ public:
 	int getATT() { return m_attackPoints; } // ^ v getHp from initiliased values
 	int getDEF() { return m_defendPoints; }
 
-	bool isAlive() { return (m_healthPoints > 0); }; // isAlive = true if health_points more than 0
+	bool isAlive() { return (m_healthPoints > 0); } // isAlive = true if health_points more than 0
 
 	void onAttacked(int attackPoints); // function to change variables when attacked. I.e. percentage to block attacks, use special defence powerups etc.
 

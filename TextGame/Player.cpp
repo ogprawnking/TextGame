@@ -125,7 +125,7 @@ void Player::pickup(Room* pRoom)
 		pRoom->setFood(nullptr);
 	}
 	else {
-		std::cout << INDENT << "There si nothing here to pick up." << std::endl;
+		std::cout << INDENT << "There is nothing here to pick up." << std::endl;
 	}
 }
 
@@ -138,7 +138,7 @@ void Player::attack(Enemy* pEnemy)
 		pEnemy->onAttacked(m_attackPoints);
 
 		if (pEnemy->isAlive() == false) {
-			std::cout << INDENT << "You fighta gure and kill it." << std::endl;
+			std::cout << INDENT << "You fight a grue and kill it." << std::endl;
 		}
 		else {
 			int damage = pEnemy->getATT() - m_defencePoints;

@@ -27,11 +27,10 @@ public:
 	void drawDescription();
 
 private:
-	Point2D m_mapPosition;
-	int m_type;
-
-	Powerup* m_powerup;
-	Enemy* m_enemy;
-	Food* m_food;
+	Point2D		m_mapPosition;
+	int			m_type;
+	Powerup*	m_powerup;
+	Enemy*		m_enemy;
+	Food*		m_food;
 };
 

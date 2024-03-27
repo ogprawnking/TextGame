@@ -12,6 +12,15 @@ void main() {
 	if (game.startup() == false)
 		return;
 
+	/*
+	while (!game.isGameOver())
+
+
+	game.isGameOver = false;
+	!game.isGameOver == true;
+	while true == true;
+	*/
+
 	// game loop
 	while (!game.isGameOver()) 
 	/* '!' operator inverses the current logic of the function

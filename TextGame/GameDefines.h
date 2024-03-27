@@ -35,8 +35,8 @@ const int PICKUP = 11;
 const int QUIT = 12;
 
 static const char itemNames[15][30] = {
- "indifference", "invisibility", "invulnerability", "incontinence",
- "improbability", "impatience", "indecision", "inspiration", "independence",
- "incurability", "integration", "invocation", "inferno", "indigestion",
- "inoculation"
+ "ouraknight,", "ligma,", "suffering,", "incontinence,",
+ "katax,", "homunculus-loxodontus,", "indecision,", "ugly,", "independence,",
+ "incurability,", "coeliac,", "severe-anxiety,", "determination,", "taylor-swiftness,",
+ "type1diabetes,"
 };

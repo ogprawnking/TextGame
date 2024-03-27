@@ -1,14 +1,14 @@
 #define _CRT_SECURE_NO_WARNINGS
+#include <iostream>
+#include <random>
+#include <time.h>
 
 #include "Game.h"
-#include <iostream>
 #include "Enemy.h"
 #include "Powerup.h"
 #include "Food.h"
-//#include <random>
-//#include <time.h>
 
-Game::Game() : m_gameOver{false}
+Game::Game() : m_gameOver{ false }
 {
 	// uniform initialise game_over here or in startup()
 }
@@ -27,6 +27,9 @@ bool Game::startup() // on game startup
 	srand(time(nullptr));
 
 	initializeMap(); // create map (includes rooms and types)
+	initializeEnemies();
+	initializePowerups();
+	initializeFood();
 		
 	m_player.setPosition(Point2D{ 0,0 }); // create player position on map
 
@@ -90,8 +93,6 @@ bool Game::isGameOver() {
 // entrance/exit rooms set
 void Game::initializeMap()
 { 
-	srand(time(nullptr));
-
 	// fill arrays with random room types
 	// nested loop... for each row(y), fill the columns(x) with randType of room and update position to x,y position of loop
 	for (int y = 0; y < MAZE_HEIGHT; y++) {
@@ -111,7 +112,7 @@ void Game::initializeMap()
 void Game::initializeEnemies()
 {
 	// create dynamic array of enemies
-	// (the number of enemies will change every game)
+	// (the number of enemies will change every game upto 4)
 	m_enemyCount = 1 + rand() % 4;
 	m_enemies = new Enemy[m_enemyCount];
 
@@ -156,7 +157,7 @@ void Game::initializePowerups()
 			m_powerups[i].setAttackMultiplier(1.1f);
 			break;
 		case 2:
-			strcpy(name, "shield of  ");
+			strcpy(name, "shield of ");
 			m_powerups[i].setDefenceMultiplier(1.1f);
 			break;
 		}

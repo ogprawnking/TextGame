@@ -15,11 +15,12 @@ public:
 	~Player();
 
 	void addPowerup(Powerup* pPowerup);
-
 	void setPosition(const Point2D& position); // Only refer to the position
 	Point2D getPosition(); // get x, y pos
+
 	void draw(); // draw player on map
 	void drawInventory(); // draws inventory on screen
+	
 	void executeCommand(int command, Room* pRoom);
 	
 private:
@@ -35,4 +36,3 @@ private:
 	int m_attackPoints;
 	int m_defencePoints;
 };
-
