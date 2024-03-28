@@ -11,14 +11,23 @@ const char* const EXIT_TILE = "[ \xFE ]";
 const char* const PLAYER_TILE = "[ \x81 ]";
 // numbers for room recognition
 const int EMPTY = 0;
+const int ENTRANCE = 4;
+const int EXIT = 5;
+ //ENEMY to TREAUSRE_DEF shouldn't be needed
 const int ENEMY = 1;
 const int TREASURE = 2;
 const int FOOD = 3;
-const int ENTRANCE = 4;
-const int EXIT = 5;
 const int TREASURE_HP = 6;
 const int TREASURE_ATT = 7;
 const int TREASURE_DEF = 8;
+ //numbers are prioritised by lowest number being priority etc.
+ //player can be drawn no matter what in a room.
+const int PRIORITY_PLAYER = 0;
+const int PRIORITY_ENEMY = 1;
+const int PRIORITY_POWERUP = 2;
+const int PRIORITY_FOOD = 3;
+const int PRIORITY_DEFAULT = 5;
+
 
 const int MAX_RANDOM_TYPE = FOOD + 1;
 
@@ -37,6 +46,6 @@ const int QUIT = 12;
 static const char itemNames[15][30] = {
  "ouraknight,", "ligma,", "suffering,", "incontinence,",
  "katax,", "homunculus-loxodontus,", "indecision,", "ugly,", "independence,",
- "incurability,", "coeliac,", "severe-anxiety,", "determination,", "taylor-swiftness,",
+ "incurability,", "coeliac,", "severe-anxiety,", "determination,", "swiftness,",
  "type1diabetes,"
 };

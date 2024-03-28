@@ -6,17 +6,18 @@
 #include "Player.h"
 #include "GameDefines.h"
 
-#include "Powerup.h"
 #include "Room.h"
+#include "Powerup.h"
 #include "Enemy.h"
 #include "Food.h"
 
-Player::Player() : m_mapPosition{ 0,0 }, m_healthPoints{ 100 }, m_attackPoints{ 20 }, m_defencePoints{ 20 }
+Player::Player() : Character({ 0, 0 }, 100, 20, 20)
 {
-	// changed values to uniform initialised list
+	m_priority = PRIORITY_PLAYER;
 }
 
-Player::Player(int x, int y) : m_mapPosition{ x,y }, m_healthPoints{ 100 }, m_attackPoints{ 20 }, m_defencePoints{ 20 }
+
+Player::Player(int x, int y) : Character({ x, y }, 100, 20, 20)
 {
 	// changed to uniform initialised list: overLConstr for altering x,y m_mapPositions
 }
@@ -25,26 +26,19 @@ Player::~Player()
 {
 }
 
-void Player::addPowerup(Powerup* pPowerup)
-{
-	m_powerups.push_back(pPowerup);
 
-	std::sort(m_powerups.begin(), m_powerups.end(), Powerup::compare);
-}
-
-void Player::setPosition(const Point2D& position)
-{
-	m_mapPosition = position;
-}
-
-Point2D Player::getPosition()
-{
-	return m_mapPosition;
-}
 
 void Player::draw()
 {
 	std::cout << PLAYER_TILE;
+}
+
+void Player::drawDescription()
+{}
+
+void Player::lookAt()
+{
+	std::cout << INDENT << "I'm still looking good!" << std::endl;
 }
 
 void Player::drawInventory()
@@ -77,18 +71,7 @@ void Player::executeCommand(int command, Room* pRoom)
 			m_mapPosition.y++; // move down one spot
 		return;
 	case LOOK:
-		if (pRoom->getEnemy() != nullptr) {
-			std::cout << INDENT << "LOOK OUT! An enemy is approaching." << std::endl;
-		}
-		else if (pRoom->getPowerup() != nullptr) {
-			std::cout << INDENT << "There is some treasure here. It looks small enough to pick up." << std::endl;
-		}
-		else if (pRoom->getFood() != nullptr) {
-			std::cout << INDENT << "There is some food here. It should be edible." << std::endl;
-		}
-		else {
-		std::cout << INDENT << "You look around, but see nothing worth mentioning." << std::endl;
-		}
+		pRoom->lookAt();
 		break;
 	case FIGHT:
 		attack(pRoom->getEnemy());
@@ -111,18 +94,22 @@ void Player::executeCommand(int command, Room* pRoom)
 void Player::pickup(Room* pRoom)
 {
 	if (pRoom->getPowerup() != nullptr) {
-		std::cout << INDENT << "You pick up the " << pRoom->getPowerup()->getName() << std::endl;
+		Powerup* powerup = pRoom->getPowerup();
+		std::cout << INDENT << "You pick up the " << powerup->getName() << std::endl;
 		// add powerup to player's inventory
-		addPowerup(pRoom->getPowerup());
+		addPowerup(powerup);
 		// remove powerup from room... DON'T delete it (the player OWNS it now!)
-		pRoom->setPowerup(nullptr);
+		pRoom->removeGameObject(powerup);
+
 	}
 	else if (pRoom->getFood() != nullptr) {
+		Food* food = pRoom->getFood();
 		// eat the food
-		m_healthPoints += pRoom->getFood()->getHP();
+		m_healthPoints += food->getHP();
 		std::cout << INDENT << "You feel refreshed. Your health is now " << m_healthPoints << std::endl;
 		// remove food from the room
-		pRoom->setFood(nullptr);
+		pRoom->removeGameObject(food);
+
 	}
 	else {
 		std::cout << INDENT << "There is nothing here to pick up." << std::endl;
@@ -138,14 +125,16 @@ void Player::attack(Enemy* pEnemy)
 		pEnemy->onAttacked(m_attackPoints);
 
 		if (pEnemy->isAlive() == false) {
-			std::cout << INDENT << "You fight a grue and kill it." << std::endl;
+			std::cout << INDENT << "You fight a enemy and kill it." << std::endl;
 		}
 		else {
-			int damage = pEnemy->getATT() - m_defencePoints;
+			int damage = pEnemy->getAT() - m_defencePoints;
+			if (damage < 0)
+				damage = 1 + rand() % 10;
 			m_healthPoints -= damage;
 
-			std::cout << INDENT << "You fight a grue and take " << damage << " points damage. Your health is now at " << m_healthPoints << std::endl;
-			std::cout << INDENT << "The grue has " << pEnemy->getHP() << " health remaining." << std::endl;
+			std::cout << INDENT << "You fight and take " << damage << " points damage. Your health is now at " << m_healthPoints << std::endl;
+			std::cout << INDENT << "The enemy has " << pEnemy->getHP() << " health remaining." << std::endl;
 		}
 	}
 }

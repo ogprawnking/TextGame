@@ -3,15 +3,18 @@
 #include "String.h" // Custom String class
 
 #include <iostream>
+#include <algorithm>
 
+#include "GameObject.h"
+#include "Enemy.h"
 #include "Room.h"
 #include "GameDefines.h"
 #include "Powerup.h"
-#include "Player.h"
+//#include "Player.h"
 #include "Food.h"
 
 
-Room::Room() : m_type(EMPTY), m_mapPosition{ 0,0 }, m_powerup{ nullptr }, m_enemy{ nullptr }, m_food{ nullptr}
+Room::Room() : m_type{ EMPTY }, m_mapPosition{ 0, 0 }
 {
 }
 
@@ -29,6 +32,24 @@ void Room::setType(int type)
 	m_type = type;
 }
 
+// add object to the vector of objects
+void Room::addGameObject(GameObject* object)
+{
+	m_objects.push_back(object);
+	std::sort(m_objects.begin(), m_objects.end(), GameObject::compare);
+}
+
+// remove object from vector
+void Room::removeGameObject(GameObject* object)
+{
+	for (auto it = m_objects.begin(); it != m_objects.end(); it++) {
+		if (*it == object) {
+			m_objects.erase(it);
+			return;
+		}
+	}
+}
+
 int Room::getType()
 {
 	return m_type;
@@ -38,31 +59,13 @@ void Room::draw()
 {
 	switch (m_type)
 	{
+		// list is much shorter, this applies room type to the room
 	case EMPTY:
-		if (m_enemy != nullptr) {
-			std::cout << ENEMY_TILE;
-			break;
-		}
-		if (m_powerup != nullptr) {
-			std::cout << TREASURE_TILE;
-			break;
-		}
-		if (m_food != nullptr) {
-			std::cout << FOOD_TILE;
-			break;
-		}
-		std::cout << EMPTY_TILE;
-		break;
-	case ENEMY:
-		std::cout << ENEMY_TILE;
-		break;
-	case TREASURE_HP:
-	case TREASURE_ATT:
-	case TREASURE_DEF:
-		std::cout << TREASURE_TILE;
-		break;
-	case FOOD:
-		std::cout << FOOD_TILE;
+		// assume first object in vector takes priority
+		if (m_objects.size() > 0)
+			m_objects[0]->draw();
+		else
+			std::cout << EMPTY_TILE;
 		break;
 	case ENTRANCE:
 		std::cout << ENTRANCE_TILE;
@@ -77,26 +80,59 @@ void Room::drawDescription() // used to describe current room
 {
 	switch (m_type) {
 	case EMPTY:
-		// check if an "EMPTY (Default) room" has an enemy, treasure or food (using pointers)
-		if (m_enemy != nullptr) {
-			std::cout << INDENT << "BEWARE. An enemy is approaching." << std::endl;
-			break;
-		}
-		if (m_powerup != nullptr) {
-			std::cout << INDENT << "Your journey has been rewarded. You have found some treasure" << std::endl;
-			break;
-		}
-		if (m_food != nullptr) {
-			std::cout << INDENT << "At last! You collect some food to sustain you on your journey." << std::endl;
-			break;
-		}
-		std::cout << INDENT << "You are in an empty meadow. There is nothing of note here." << std::endl;
+		// checks if room has objects and makes description.
+		if (m_objects.size() > 0)
+			m_objects[0]->drawDescription();
+		else
+		std::cout << INDENT << "You're in a meadow of grass. It's quite tranquil here." << std::endl;
 		break;
 	case ENTRANCE:
 		std::cout << INDENT << "The entrance you used to enter this maze is blocked. There is no going back." << std::endl;
 		break;
 	case EXIT:
-		std::cout << INDENT << "Despite all odds, you made it to the exit. Congratulations." << std::endl;
+		std::cout << INDENT << "You see an out! Time to go home." << std::endl;
 		break;
 	}
+}
+
+// check room for objects and output them
+void Room::lookAt()
+{
+	if (m_objects.size() > 0)
+		m_objects[0]->lookAt();
+	else
+		std::cout << "You look around, but see nothing worth mentioning" << std::endl;
+}
+
+// if no enemy in room return nullptr
+Enemy* Room::getEnemy()
+{
+	for (GameObject* pObj : m_objects) {
+		Enemy* enemy = dynamic_cast<Enemy*>(pObj);
+		if (enemy != nullptr)
+			return enemy;
+	}
+	return nullptr;
+}
+
+// if no powerup return nullptr
+Powerup* Room::getPowerup()
+{
+	for (GameObject* pObj : m_objects) {
+		Powerup* powerup = dynamic_cast<Powerup*>(pObj);
+		if (powerup != nullptr)
+			return powerup;
+	}
+	return nullptr;
+}
+
+// if no food return nullptr
+Food* Room::getFood()
+{
+	for (GameObject* pObj : m_objects) {
+		Food* food = dynamic_cast<Food*>(pObj);
+		if (food != nullptr)
+			return food;
+	}
+	return nullptr;
 }

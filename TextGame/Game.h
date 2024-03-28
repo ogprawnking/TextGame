@@ -3,6 +3,7 @@
 #include "GameDefines.h"
 #include "Room.h"
 #include "Player.h"
+//#include "GameObject.h"
 
 class Enemy;
 class Food;

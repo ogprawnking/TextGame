@@ -5,8 +5,9 @@
 
 #include "Game.h"
 #include "Enemy.h"
-#include "Powerup.h"
 #include "Food.h"
+#include "Powerup.h"
+//#include "GameObject.h"
 
 Game::Game() : m_gameOver{ false }
 {
@@ -58,7 +59,7 @@ void Game::update()
 	for (int i = 0; i < m_enemyCount; i++) {
 		if (m_enemies[i].isAlive() == false) {
 			Point2D pos = m_enemies[i].getPosition();
-			m_map[pos.y][pos.x].setEnemy(nullptr);
+			m_map[pos.y][pos.x].removeGameObject(&m_enemies[i]);
 		}
 	}
 }
@@ -70,8 +71,8 @@ void Game::draw()
 	// draw current room desc
 	// draw  map
 	// draw player
-	Point2D playerPos = m_player.getPosition();
 	system("cls");
+	Point2D playerPos = m_player.getPosition();
 	drawWelcomeMessage();
 	// list directions player can move
 	drawValidDirections();
@@ -125,7 +126,7 @@ void Game::initializeEnemies()
 		int y = 2 + (rand() % (MAZE_HEIGHT - 3));
 
 		m_enemies[i].setPosition(Point2D{ x,y });
-		m_map[y][x].setEnemy(&m_enemies[i]);
+		m_map[y][x].addGameObject(&m_enemies[i]);
 	}
 }
 
@@ -164,7 +165,7 @@ void Game::initializePowerups()
 
 		strncat(name, itemNames[(rand() % 15)], 30);
 		m_powerups[i].setName(name);
-		m_map[y][x].setPowerup(&m_powerups[i]);
+		m_map[y][x].addGameObject(&m_powerups[i]); //********************
 	}
 }
 
@@ -180,7 +181,7 @@ void Game::initializeFood()
 	{
 		int x = rand() % (MAZE_WIDTH - 1);
 		int y = rand() % (MAZE_HEIGHT - 1);
-		m_map[y][x].setFood(&m_food[i]);
+		m_map[y][x].addGameObject(&m_food[i]);
 	}
 }
 
